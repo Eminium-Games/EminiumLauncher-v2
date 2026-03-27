@@ -1,6 +1,9 @@
-name: Build
+name: Build and Release
 
-on: push
+on:
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   release:
@@ -31,8 +34,25 @@ jobs:
         run: npm ci
         shell: bash
 
-      - name: Build
+      - name: Build for ${{ matrix.os }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run dist
+        run: |
+          if [ "${{ matrix.os }}" = "macos-latest" ]; then
+            npm run dist:mac
+          elif [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+            npm run dist:linux
+          elif [ "${{ matrix.os }}" = "windows-latest" ]; then
+            npm run dist:win
+          fi
         shell: bash
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.os }}-build
+          path: |
+            dist/*.exe
+            dist/*.dmg
+            dist/*.AppImage
+            dist/**-unpacked/

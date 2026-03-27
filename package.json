@@ -1,6 +1,6 @@
 {
   "name": "eminium-launcher",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "productName": "Eminium Games Launcher",
   "description": "Modded Minecraft Launcher",
   "author": "Eminium Games (https://eminium.ovh)",
@@ -13,10 +13,11 @@
   "main": "index.js",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder build",
+    "dist": "electron-builder build --win --linux",
     "dist:win": "npm run dist -- -w",
-    "dist:mac": "npm run dist -- -m",
+    "dist:mac": "electron-builder build --mac",
     "dist:linux": "npm run dist -- -l",
+    "dist:all": "electron-builder build --win --linux --mac",
     "lint": "eslint ."
   },
   "engines": {
