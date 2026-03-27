@@ -1,0 +1,31 @@
+{
+  "version": "1.0.0",
+  "discord": {
+    "clientId": "YOUR_DISCORD_CLIENT_ID",
+    "smallImageText": "Eminium",
+    "smallImageKey": "seal-circle"
+  },
+  "java": {
+    "oracle": "http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html"
+  },
+  "rss": "https://eminium.ovh/api/rss",
+  "servers": [
+    {
+      "id": "Eminium-1.20.1",
+      "name": "Eminium Server",
+      "description": "Join the Eminium Minecraft Mini-Games server!",
+      "icon": "https://eminium.ovh/storage/img/logo-eminium-12012026-2.png",
+      "version": "1.0.0.0",
+      "address": "eminium.ovh",
+      "minecraftVersion": "1.20.1",
+      "discord": {
+        "shortId": "Eminium",
+        "largeImageText": "Eminium Server",
+        "largeImageKey": "server-eminium"
+      },
+      "mainServer": true,
+      "autoconnect": true,
+      "modules": []
+    }
+  ]
+}
