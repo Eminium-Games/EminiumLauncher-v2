@@ -35,6 +35,7 @@ mac:
         - 'arm64'
   artifactName: '${productName}-setup-${version}-${arch}.${ext}'
   category: 'public.app-category.games'
+  gatekeeperAssess: false
 
 # Linux Configuration
 linux: 
@@ -46,8 +47,6 @@ linux:
   synopsis: 'Modded Minecraft Launcher'
   description: 'Custom launcher which allows users to join modded servers. All mods, configurations, and updates are handled automatically.'
   category: 'Game'
-  icon: 'build/icon.png'
-
 
 directories:
   buildResources: 'build'
