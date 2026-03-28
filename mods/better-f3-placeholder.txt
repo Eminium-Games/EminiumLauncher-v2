@@ -1,0 +1,31 @@
+# Better F3 Mod - NeoForge Version
+
+Ce fichier est un placeholder pour le mod Better F3 qui sera ajouté comme mod obligatoire pour NeoForge.
+
+## Description
+
+Better F3 est un mod qui améliore l'affichage des informations de debug (F3) dans Minecraft en offrant :
+- Une meilleure lisibilité des informations
+- Des options de personnalisation
+- Des informations supplémentaires utiles
+
+## Configuration pour NeoForge + Modrinth
+
+Le mod est configuré dans `distribution.json` avec :
+- **Type** : `neoforge`
+- **Version** : `1.6.0`
+- **Source** : Modrinth (betterf3)
+- **Requis** : `true`
+
+## Installation automatique
+
+Le launcher utilisera Modrinth pour télécharger automatiquement :
+1. La version compatible avec NeoForge
+2. La version compatible avec Minecraft 1.21.1
+3. Le mod sera placé automatiquement dans le dossier des mods
+
+## Notes
+
+- Le mod sera détecté comme obligatoire par le launcher
+- Impossible à désactiver par les utilisateurs
+- Téléchargement depuis Modrinth lors du premier lancement
