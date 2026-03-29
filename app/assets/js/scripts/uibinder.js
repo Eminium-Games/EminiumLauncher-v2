@@ -59,10 +59,9 @@ function getCurrentView(){
 
 async function showMainUI(data){
 
-    if(!isDev){
-        loggerAutoUpdater.info('Initializing..')
-        ipcRenderer.send('autoUpdateAction', 'initAutoUpdater', ConfigManager.getAllowPrerelease())
-    }
+    // Initialize updater in all environments
+    loggerAutoUpdater.info('Initializing..')
+    ipcRenderer.send('autoUpdateAction', 'initAutoUpdater', ConfigManager.getAllowPrerelease())
 
     await prepareSettings(true)
     updateSelectedServer(data.getServerById(ConfigManager.getSelectedServer()))

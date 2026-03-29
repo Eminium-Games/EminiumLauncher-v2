@@ -3,55 +3,139 @@ remoteMain.initialize()
 
 // Requirements
 const { app, BrowserWindow, ipcMain, Menu, shell } = require('electron')
-const autoUpdater                       = require('electron-updater').autoUpdater
-const ejse                              = require('ejs-electron')
-const fs                                = require('fs')
-const isDev                             = require('./app/assets/js/isdev')
-const path                              = require('path')
-const semver                            = require('semver')
+const axios                           = require('axios')
+const ejse                            = require('ejs-electron')
+const fs                              = require('fs')
+const isDev                           = require('./app/assets/js/isdev')
+const path                            = require('path')
+const semver                          = require('semver')
 const { pathToFileURL }                 = require('url')
 const { AZURE_CLIENT_ID, MSFT_OPCODE, MSFT_REPLY_TYPE, MSFT_ERROR, SHELL_OPCODE } = require('./app/assets/js/ipcconstants')
-const LangLoader                        = require('./app/assets/js/langloader')
+const LangLoader                      = require('./app/assets/js/langloader')
+const { exec }                        = require('child_process')
+const os                              = require('os')
 
 // Setup Lang
 LangLoader.setupLanguage()
 
-// Setup auto updater.
+// Setup custom updater that checks GitHub releases
 function initAutoUpdater(event, data) {
-
-    if(data){
-        autoUpdater.allowPrerelease = true
-    } else {
-        // Defaults to true if application version contains prerelease components (e.g. 0.12.1-alpha.1)
-        // autoUpdater.allowPrerelease = true
-    }
     
-    if(isDev){
-        autoUpdater.autoInstallOnAppQuit = false
-        autoUpdater.updateConfigPath = path.join(__dirname, 'dev-app-update.yml')
+    // Send ready status
+    event.sender.send('autoUpdateNotification', 'ready')
+}
+
+// Check for updates by comparing with master branch package.json
+async function checkForUpdates() {
+    try {
+        // Configure axios to ignore SSL errors in development
+        const axiosConfig = isDev ? {
+            httpsAgent: new (require('https').Agent)({
+                rejectUnauthorized: false
+            })
+        } : {}
+        
+        // Get package.json from master branch
+        const response = await axios.get('https://raw.githubusercontent.com/Eminium-Games/EminiumLauncher-v2/master/package.json', axiosConfig)
+        const masterPackage = response.data
+        
+        const currentVersion = app.getVersion()
+        const masterVersion = masterPackage.version
+        
+        console.log(`Current version: ${currentVersion}, Master version: ${masterVersion}`)
+        
+        // Compare versions
+        if (semver.gt(masterVersion, currentVersion)) {
+            console.log('Update available!')
+            
+            // Check if the release actually exists
+            const downloadUrl = `https://github.com/Eminium-Games/EminiumLauncher-v2/releases/download/v${masterVersion}/Eminium%20Games%20Launcher%20Setup%20${masterVersion}.exe`
+            
+            try {
+                await axios.head(downloadUrl)
+                console.log('Release file exists!')
+                return {
+                    updateAvailable: true,
+                    currentVersion,
+                    latestVersion: masterVersion,
+                    downloadUrl,
+                    canInstall: true
+                }
+            } catch (error) {
+                console.log('Release file not found, update available but not downloadable')
+                return {
+                    updateAvailable: true,
+                    currentVersion,
+                    latestVersion: masterVersion,
+                    downloadUrl: `https://github.com/Eminium-Games/EminiumLauncher-v2/releases/latest`,
+                    canInstall: false
+                }
+            }
+        } else {
+            console.log('No update available')
+            return {
+                updateAvailable: false,
+                currentVersion,
+                latestVersion: masterVersion
+            }
+        }
+    } catch (error) {
+        console.error('Error checking for updates:', error.message)
+        // Don't throw error, just return no update available
+        return {
+            updateAvailable: false,
+            currentVersion: app.getVersion(),
+            latestVersion: app.getVersion(),
+            error: error.message
+        }
     }
-    if(process.platform === 'darwin'){
-        autoUpdater.autoDownload = false
+}
+
+// Download and install update automatically
+async function downloadAndInstallUpdate(latestVersion) {
+    try {
+        const downloadUrl = `https://github.com/Eminium-Games/EminiumLauncher-v2/releases/download/v${latestVersion}/Eminium%20Games%20Launcher%20Setup%20${latestVersion}.exe`
+        const tempDir = os.tmpdir()
+        const installerPath = path.join(tempDir, `EminiumLauncher-${latestVersion}.exe`)
+        
+        console.log(`Downloading update from: ${downloadUrl}`)
+        console.log(`Saving to: ${installerPath}`)
+        
+        // Download the installer
+        const response = await axios({
+            method: 'GET',
+            url: downloadUrl,
+            responseType: 'stream'
+        })
+        
+        const writer = fs.createWriteStream(installerPath)
+        response.data.pipe(writer)
+        
+        await new Promise((resolve, reject) => {
+            writer.on('finish', resolve)
+            writer.on('error', reject)
+        })
+        
+        console.log('Download complete, installing...')
+        
+        // Execute the installer and quit the app
+        exec(`"${installerPath}" /S`, (error) => {
+            if (error) {
+                console.error('Installation error:', error)
+                return
+            }
+            console.log('Installer launched, quitting app...')
+            app.quit()
+        })
+        
+    } catch (error) {
+        console.error('Error downloading update:', error)
+        throw error
     }
-    autoUpdater.on('update-available', (info) => {
-        event.sender.send('autoUpdateNotification', 'update-available', info)
-    })
-    autoUpdater.on('update-downloaded', (info) => {
-        event.sender.send('autoUpdateNotification', 'update-downloaded', info)
-    })
-    autoUpdater.on('update-not-available', (info) => {
-        event.sender.send('autoUpdateNotification', 'update-not-available', info)
-    })
-    autoUpdater.on('checking-for-update', () => {
-        event.sender.send('autoUpdateNotification', 'checking-for-update')
-    })
-    autoUpdater.on('error', (err) => {
-        event.sender.send('autoUpdateNotification', 'realerror', err)
-    }) 
 }
 
 // Open channel to listen for update actions.
-ipcMain.on('autoUpdateAction', (event, arg, data) => {
+ipcMain.on('autoUpdateAction', async (event, arg, data) => {
     switch(arg){
         case 'initAutoUpdater':
             console.log('Initializing auto updater.')
@@ -59,31 +143,46 @@ ipcMain.on('autoUpdateAction', (event, arg, data) => {
             event.sender.send('autoUpdateNotification', 'ready')
             break
         case 'checkForUpdate':
-            autoUpdater.checkForUpdates()
-                .catch(err => {
-                    event.sender.send('autoUpdateNotification', 'realerror', err)
-                })
-            break
-        case 'allowPrereleaseChange':
-            if(!data){
-                const preRelComp = semver.prerelease(app.getVersion())
-                if(preRelComp != null && preRelComp.length > 0){
-                    autoUpdater.allowPrerelease = true
+            console.log('Checking for updates...')
+            event.sender.send('autoUpdateNotification', 'checking-for-update')
+            try {
+                const updateInfo = await checkForUpdates()
+                if (updateInfo.updateAvailable) {
+                    event.sender.send('autoUpdateNotification', 'update-available', updateInfo)
                 } else {
-                    autoUpdater.allowPrerelease = data
+                    event.sender.send('autoUpdateNotification', 'update-not-available', updateInfo)
                 }
-            } else {
-                autoUpdater.allowPrerelease = data
+            } catch (err) {
+                event.sender.send('autoUpdateNotification', 'realerror', err)
             }
             break
+        case 'allowPrereleaseChange':
+            // Not needed for custom updater
+            break
         case 'installUpdateNow':
-            autoUpdater.quitAndInstall()
+            console.log('Starting update installation...')
+            try {
+                const updateInfo = await checkForUpdates()
+                if (updateInfo.updateAvailable && updateInfo.canInstall) {
+                    console.log('Release file exists, downloading and installing...')
+                    event.sender.send('autoUpdateNotification', 'update-downloaded', updateInfo)
+                    await downloadAndInstallUpdate(updateInfo.latestVersion)
+                } else if (updateInfo.updateAvailable && !updateInfo.canInstall) {
+                    console.log('Release not ready, opening releases page...')
+                    shell.openExternal('https://github.com/Eminium-Games/EminiumLauncher-v2/releases/latest')
+                } else {
+                    console.log('No update available to install')
+                }
+            } catch (error) {
+                console.error('Error during update installation:', error)
+                event.sender.send('autoUpdateNotification', 'realerror', error)
+            }
             break
         default:
             console.log('Unknown argument', arg)
-            break
     }
 })
+
 // Redirect distribution index event from preloader to renderer.
 ipcMain.on('distributionIndexDone', (event, res) => {
     event.sender.send('distributionIndexDone', res)

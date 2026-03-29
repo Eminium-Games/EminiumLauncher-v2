@@ -6,7 +6,7 @@ on:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     permissions:
       contents: write
@@ -36,24 +36,19 @@ jobs:
             echo "exists=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Wait for builds
+      - name: Build Windows Release
         if: steps.check_tag.outputs.exists == 'false'
-        run: sleep 60
-
-      - name: Download all artifacts
-        if: steps.check_tag.outputs.exists == 'false'
-        uses: actions/download-artifact@v4
-        with:
-          pattern: "*-build"
-          merge-multiple: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run dist:win
 
       - name: Create Release
         if: steps.check_tag.outputs.exists == 'false'
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            *.exe
-            *.yml
+            dist/*.exe
+            dist/*.yml
           name: "Eminium Games Launcher v${{ steps.version.outputs.VERSION }}"
           tag_name: "v${{ steps.version.outputs.VERSION }}"
           generate_release_notes: true

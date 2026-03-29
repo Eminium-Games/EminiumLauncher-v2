@@ -35,10 +35,9 @@ remote.getCurrentWebContents().on('devtools-opened', () => {
 webFrame.setZoomLevel(0)
 webFrame.setVisualZoomLevelLimits(1, 1)
 
-// Initialize auto updates in production environments.
+// Initialize auto updates in all environments.
 let updateCheckListener
-if(!isDev){
-    ipcRenderer.on('autoUpdateNotification', (event, arg, info) => {
+ipcRenderer.on('autoUpdateNotification', (event, arg, info) => {
         switch(arg){
             case 'checking-for-update':
                 loggerAutoUpdater.info('Checking for update..')
@@ -46,28 +45,26 @@ if(!isDev){
                 break
             case 'update-available':
                 loggerAutoUpdater.info('New update available', info.version)
+                console.log('[UPDATER] Update available! Version:', info.latestVersion, 'Current:', info.currentVersion, 'Can install:', info.canInstall)
                 
-                if(process.platform === 'darwin'){
-                    info.darwindownload = `https://github.com/Eminium-Games/EminiumLauncher-v2/releases/download/v${info.version}/Eminium-Games-Launcher-setup-${info.version}${process.arch === 'arm64' ? '-arm64' : '-x64'}.dmg`
-                    showUpdateUI(info)
-                }
-                
-                populateSettingsUpdateInformation(info)
-                break
-            case 'update-downloaded':
-                loggerAutoUpdater.info('Update ' + info.version + ' ready to be installed.')
-                settingsUpdateButtonStatus(Lang.queryJS('uicore.autoUpdate.installNowButton'), false, () => {
-                    if(!isDev){
+                if (info.canInstall) {
+                    settingsUpdateButtonStatus(Lang.queryJS('uicore.autoUpdate.installNowButton'), false, () => {
                         ipcRenderer.send('autoUpdateAction', 'installUpdateNow')
-                    }
-                })
+                    })
+                } else {
+                    settingsUpdateButtonStatus('View Release', false, () => {
+                        ipcRenderer.send('autoUpdateAction', 'installUpdateNow')
+                    })
+                }
                 showUpdateUI(info)
                 break
             case 'update-not-available':
                 loggerAutoUpdater.info('No new update found.')
+                console.log('[UPDATER] No update available. Current version:', info ? info.currentVersion : 'unknown')
                 settingsUpdateButtonStatus(Lang.queryJS('uicore.autoUpdate.checkForUpdatesButton'))
                 break
             case 'ready':
+                console.log('[UPDATER] Auto updater ready - starting first check')
                 updateCheckListener = setInterval(() => {
                     ipcRenderer.send('autoUpdateAction', 'checkForUpdate')
                 }, 1800000)
@@ -90,7 +87,6 @@ if(!isDev){
                 break
         }
     })
-}
 
 /**
  * Send a notification to the main process changing the value of
@@ -108,22 +104,20 @@ function showUpdateUI(info){
     //TODO Make this message a bit more informative `${info.version}`
     document.getElementById('image_seal_container').setAttribute('update', true)
     document.getElementById('image_seal_container').onclick = () => {
-        /*setOverlayContent('Update Available', 'A new update for the launcher is available. Would you like to install now?', 'Install', 'Later')
+        const message = info.canInstall 
+            ? `A new update for the launcher is available: ${info.latestVersion}. Would you like to install now?`
+            : `A new update for the launcher is available: ${info.latestVersion}. The release is being prepared. Would you like to view the release page?`
+        
+        const buttonText = info.canInstall ? 'Install' : 'View Release'
+        
+        setOverlayContent('Update Available', message, buttonText, 'Later')
         setOverlayHandler(() => {
-            if(!isDev){
-                ipcRenderer.send('autoUpdateAction', 'installUpdateNow')
-            } else {
-                console.error('Cannot install updates in development environment.')
-                toggleOverlay(false)
-            }
+            ipcRenderer.send('autoUpdateAction', 'installUpdateNow')
         })
-        setDismissHandler(() => {
+        setOverlayDismissHandler(() => {
             toggleOverlay(false)
         })
-        toggleOverlay(true, true)*/
-        switchView(getCurrentView(), VIEWS.settings, 500, 500, () => {
-            settingsNavItemListener(document.getElementById('settingsNavUpdate'), false)
-        })
+        toggleOverlay(true)
     }
 }
 

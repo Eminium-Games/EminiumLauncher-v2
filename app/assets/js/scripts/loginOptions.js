@@ -28,23 +28,27 @@ loginOptionMicrosoft.onclick = (e) => {
     })
 }
 
-loginOptionMojang.onclick = (e) => {
-    switchView(getCurrentView(), VIEWS.login, 500, 500, () => {
-        loginViewOnSuccess = loginOptionsViewOnLoginSuccess
-        loginViewOnCancel = loginOptionsViewOnLoginCancel
-        loginCancelEnabled(true)
-    })
+if (loginOptionMojang) {
+    loginOptionMojang.onclick = (e) => {
+        switchView(getCurrentView(), VIEWS.login, 500, 500, () => {
+            loginViewOnSuccess = loginOptionsViewOnLoginSuccess
+            loginViewOnCancel = loginOptionsViewOnLoginCancel
+            loginCancelEnabled(true)
+        })
+    }
 }
 
-loginOptionsCancelButton.onclick = (e) => {
-    switchView(getCurrentView(), loginOptionsViewOnCancel, 500, 500, () => {
-        // Clear login values (Mojang login)
-        // No cleanup needed for Microsoft.
-        loginUsername.value = ''
-        loginPassword.value = ''
-        if(loginOptionsViewCancelHandler != null){
-            loginOptionsViewCancelHandler()
-            loginOptionsViewCancelHandler = null
-        }
-    })
+if (loginOptionsCancelButton) {
+    loginOptionsCancelButton.onclick = (e) => {
+        switchView(getCurrentView(), loginOptionsViewOnCancel, 500, 500, () => {
+            // Clear login values (Mojang login)
+            // No cleanup needed for Microsoft.
+            loginUsername.value = ''
+            loginPassword.value = ''
+            if(loginOptionsViewCancelHandler != null){
+                loginOptionsViewCancelHandler()
+                loginOptionsViewCancelHandler = null
+            }
+        })
+    }
 }
