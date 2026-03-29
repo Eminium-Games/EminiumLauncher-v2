@@ -53,9 +53,6 @@ jobs:
         with:
           files: |
             *.exe
-            *.dmg
-            *.AppImage
-            *.zip
           name: "Eminium Games Launcher v${{ steps.version.outputs.VERSION }}"
           tag_name: "v${{ steps.version.outputs.VERSION }}"
           generate_release_notes: true
