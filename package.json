@@ -14,9 +14,9 @@
   "scripts": {
     "start": "electron .",
     "dist": "electron-builder build --win --linux",
-    "dist:win": "npm run dist -- -w",
+    "dist:win": "electron-builder build --win",
     "dist:mac": "electron-builder build --mac",
-    "dist:linux": "npm run dist -- -l",
+    "dist:linux": "electron-builder build --linux",
     "dist:all": "electron-builder build --win --linux --mac",
     "lint": "eslint ."
   },
@@ -78,7 +78,7 @@
           "arch": ["x64"]
         }
       ],
-      "icon": "app/assets/images/icon.ico"
+      "icon": "app/assets/images/SealCircle.ico"
     },
     "mac": {
       "target": [
@@ -91,7 +91,6 @@
           "arch": ["x64", "arm64"]
         }
       ],
-      "icon": "app/assets/images/icon.icns",
       "category": "public.app-category.games",
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
