@@ -80,7 +80,6 @@
     },
     "linux": {
       "target": "AppImage",
-      "icon": "app/assets/images/icon.png",
       "category": "Game"
     },
     "nsis": {
