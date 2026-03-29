@@ -37,6 +37,11 @@ jobs:
         run: npm ci
         shell: bash
 
+      - name: Install macOS Dependencies
+        if: matrix.platform == 'mac'
+        run: npm install dmg-license
+        shell: bash
+
       - name: Build
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
