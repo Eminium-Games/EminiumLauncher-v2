@@ -49,5 +49,96 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Eminium-Games/EminiumLauncher-v2.git"
+  },
+  "build": {
+    "appId": "ovh.eminium.launcher",
+    "productName": "Eminium Games Launcher",
+    "copyright": "Copyright © 2024 Eminium Games",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+      "!**/node_modules/*.d.ts",
+      "!**/node_modules/.bin",
+      "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
+      "!.editorconfig",
+      "!**/._*",
+      "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
+      "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
+      "!**/{appveyor.yml,.travis.yml,circle.yml}",
+      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "app/assets/images/icon.ico"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "icon": "app/assets/images/icon.icns",
+      "category": "public.app-category.games",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "app/assets/images/icon.png",
+      "category": "Game"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "dmg": {
+      "background": "build/dmg-background.png",
+      "iconSize": 100,
+      "contents": [
+        {
+          "x": 380,
+          "y": 280,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 110,
+          "y": 280,
+          "type": "file"
+        }
+      ],
+      "window": {
+        "width": 540,
+        "height": 380
+      }
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "Eminium-Games",
+      "repo": "EminiumLauncher-v2"
+    }
   }
 }

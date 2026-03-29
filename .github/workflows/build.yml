@@ -48,6 +48,8 @@ jobs:
       - name: Build for ${{ matrix.os }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
         run: |
           if [ "${{ matrix.os }}" = "macos-latest" ]; then
             npm run dist:mac
@@ -68,3 +70,4 @@ jobs:
             dist/*.dmg
             dist/*.AppImage
             dist/**-unpacked/
+          retention-days: 30

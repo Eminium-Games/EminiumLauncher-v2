@@ -59,6 +59,8 @@ jobs:
             *.exe
             *.dmg
             *.AppImage
+            latest.yml
+            latest-mac.yml
           name: "Eminium Games Launcher v${{ steps.version.outputs.VERSION }}"
           tag_name: "v${{ steps.version.outputs.VERSION }}"
           generate_release_notes: true

@@ -22,6 +22,8 @@ jobs:
             dist/*.exe
             dist/*.dmg
             dist/*.AppImage
+            dist/latest.yml
+            dist/latest-mac.yml
           generate_release_notes: true
           draft: false
           prerelease: false

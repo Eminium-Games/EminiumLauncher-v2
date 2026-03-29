@@ -1,0 +1,19 @@
+name: Update Check
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours
+  workflow_dispatch:
+
+jobs:
+  update-check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check for Updates
+        run: |
+          echo "Checking for launcher updates..."
+          # This workflow can be used to trigger update notifications
+          # The actual update checking is handled by electron-updater in the app
