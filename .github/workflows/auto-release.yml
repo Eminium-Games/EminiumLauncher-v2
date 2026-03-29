@@ -30,17 +30,13 @@ jobs:
           $version = node -p "require('./package.json').version"
           echo "VERSION=$version" >> $env:GITHUB_OUTPUT
 
-      - name: Check if tag exists
+      - name: Check if release exists
         id: check_tag
         shell: powershell
         run: |
           try {
-            $tagExists = git rev-parse "v${{ steps.version.outputs.VERSION }}" 2>$null
-            if ($LASTEXITCODE -eq 0) {
-              echo "exists=true" >> $env:GITHUB_OUTPUT
-            } else {
-              echo "exists=false" >> $env:GITHUB_OUTPUT
-            }
+            $response = Invoke-RestMethod -Uri "https://api.github.com/repos/Eminium-Games/EminiumLauncher-v2/releases/tags/v${{ steps.version.outputs.VERSION }}" -Headers @{"Accept"="application/vnd.github.v3+json"}
+            echo "exists=true" >> $env:GITHUB_OUTPUT
           } catch {
             echo "exists=false" >> $env:GITHUB_OUTPUT
           }
