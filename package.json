@@ -13,11 +13,10 @@
   "main": "index.js",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder build --win --linux",
-    "dist:win": "electron-builder build --win",
-    "dist:mac": "electron-builder build --mac",
-    "dist:linux": "electron-builder build --linux",
-    "dist:all": "electron-builder build --win --linux --mac",
+    "dist": "electron-builder build",
+    "dist:win": "npm run dist -- -w",
+    "dist:mac": "npm run dist -- -m",
+    "dist:linux": "npm run dist -- -l",
     "lint": "eslint ."
   },
   "engines": {
