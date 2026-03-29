@@ -52,25 +52,17 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run dist:win
 
-      - name: Upload File to Existing Release
+      - name: Create Release
         if: steps.check_tag.outputs.exists == 'false'
-        shell: powershell
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.exe
+            dist/*.yml
+          name: "Eminium Games Launcher v${{ steps.version.outputs.VERSION }}"
+          tag_name: "v${{ steps.version.outputs.VERSION }}"
+          generate_release_notes: true
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          $headers = @{
-            "Accept" = "application/vnd.github.v3+json"
-            "Authorization" = "token $env:GITHUB_TOKEN"
-          }
-          $releaseResponse = Invoke-RestMethod -Uri "https://api.github.com/repos/Eminium-Games/EminiumLauncher-v2/releases/tags/v${{ steps.version.outputs.VERSION }}" -Headers $headers
-          $releaseId = $releaseResponse.id
-          
-          # Upload the exe file
-          $exePath = Get-ChildItem -Path "dist" -Filter "*.exe" | Select-Object -First 1
-          $uploadUrl = "https://uploads.github.com/repos/Eminium-Games/EminiumLauncher-v2/releases/$releaseId/assets?name=$($exePath.Name)"
-          
-          $uploadHeaders = @{
-            "Authorization" = "token $env:GITHUB_TOKEN"
-            "Content-Type" = "application/octet-stream"
-          }
-          Invoke-RestMethod -Uri $uploadUrl -Method POST -Headers $uploadHeaders -InFile $exePath.FullName
