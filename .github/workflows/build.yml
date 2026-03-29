@@ -45,4 +45,5 @@ jobs:
           name: ${{ matrix.platform }}-build
           path: |
             dist/*.exe
+            dist/*.yml
           retention-days: 30

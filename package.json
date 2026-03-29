@@ -1,6 +1,6 @@
 {
   "name": "eminium-launcher",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "productName": "Eminium Games Launcher",
   "description": "Modded Minecraft Launcher",
   "author": "Eminium Games (https://eminium.ovh)",
@@ -55,6 +55,11 @@
     "copyright": "Copyright 2024 Eminium Games",
     "directories": {
       "output": "dist"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "Eminium-Games",
+      "repo": "EminiumLauncher-v2"
     },
     "files": [
       "**/*",
