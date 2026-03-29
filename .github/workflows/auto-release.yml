@@ -30,13 +30,18 @@ jobs:
           $version = node -p "require('./package.json').version"
           echo "VERSION=$version" >> $env:GITHUB_OUTPUT
 
-      - name: Check if release exists
+      - name: Check if release exists and has files
         id: check_tag
         shell: powershell
         run: |
           try {
             $response = Invoke-RestMethod -Uri "https://api.github.com/repos/Eminium-Games/EminiumLauncher-v2/releases/tags/v${{ steps.version.outputs.VERSION }}" -Headers @{"Accept"="application/vnd.github.v3+json"}
-            echo "exists=true" >> $env:GITHUB_OUTPUT
+            $hasExe = $response.assets | Where-Object { $_.name -like "*.exe" }
+            if ($hasExe) {
+              echo "exists=true" >> $env:GITHUB_OUTPUT
+            } else {
+              echo "exists=false" >> $env:GITHUB_OUTPUT
+            }
           } catch {
             echo "exists=false" >> $env:GITHUB_OUTPUT
           }
@@ -47,7 +52,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run dist:win
 
-      - name: Create Release
+      - name: Update Release with Files
         if: steps.check_tag.outputs.exists == 'false'
         uses: softprops/action-gh-release@v2
         with:
@@ -59,5 +64,6 @@ jobs:
           generate_release_notes: true
           draft: false
           prerelease: false
+          update_existing: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
