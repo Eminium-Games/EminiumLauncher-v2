@@ -68,7 +68,8 @@
       "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
       "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
       "!**/{appveyor.yml,.travis.yml,circle.yml}",
-      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
+      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}",
+      "!app/assets/images/SealCircle.png"
     ],
     "win": {
       "target": "nsis",
@@ -76,7 +77,8 @@
     },
     "mac": {
       "target": "dmg",
-      "category": "public.app-category.games"
+      "category": "public.app-category.games",
+      "icon": null
     },
     "linux": {
       "target": "AppImage",
