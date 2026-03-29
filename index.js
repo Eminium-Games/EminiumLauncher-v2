@@ -48,28 +48,15 @@ async function checkForUpdates() {
         if (semver.gt(masterVersion, currentVersion)) {
             console.log('Update available!')
             
-            // Check if the release actually exists
+            // Download directly from GitHub repo (latest build)
             const downloadUrl = `https://github.com/Eminium-Games/EminiumLauncher-v2/releases/download/v${masterVersion}/Eminium%20Games%20Launcher%20Setup%20${masterVersion}.exe`
             
-            try {
-                await axios.head(downloadUrl)
-                console.log('Release file exists!')
-                return {
-                    updateAvailable: true,
-                    currentVersion,
-                    latestVersion: masterVersion,
-                    downloadUrl,
-                    canInstall: true
-                }
-            } catch (error) {
-                console.log('Release file not found, update available but not downloadable')
-                return {
-                    updateAvailable: true,
-                    currentVersion,
-                    latestVersion: masterVersion,
-                    downloadUrl: `https://github.com/Eminium-Games/EminiumLauncher-v2/releases/latest`,
-                    canInstall: false
-                }
+            return {
+                updateAvailable: true,
+                currentVersion,
+                latestVersion: masterVersion,
+                downloadUrl,
+                canInstall: true
             }
         } else {
             console.log('No update available')
