@@ -34,10 +34,14 @@ jobs:
         id: check_tag
         shell: powershell
         run: |
-          $tagExists = git rev-parse "v${{ steps.version.outputs.VERSION }}" 2>$null
-          if ($LASTEXITCODE -eq 0) {
-            echo "exists=true" >> $env:GITHUB_OUTPUT
-          } else {
+          try {
+            $tagExists = git rev-parse "v${{ steps.version.outputs.VERSION }}" 2>$null
+            if ($LASTEXITCODE -eq 0) {
+              echo "exists=true" >> $env:GITHUB_OUTPUT
+            } else {
+              echo "exists=false" >> $env:GITHUB_OUTPUT
+            }
+          } catch {
             echo "exists=false" >> $env:GITHUB_OUTPUT
           }
 
@@ -46,6 +50,15 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run dist:win
+
+      - name: Create Tag
+        if: steps.check_tag.outputs.exists == 'false'
+        shell: powershell
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "v${{ steps.version.outputs.VERSION }}"
+          git push origin "v${{ steps.version.outputs.VERSION }}"
 
       - name: Create Release
         if: steps.check_tag.outputs.exists == 'false'
