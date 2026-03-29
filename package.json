@@ -68,32 +68,25 @@
       "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
       "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
       "!**/{appveyor.yml,.travis.yml,circle.yml}",
-      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}",
-      "!app/assets/images/*.png",
-      "!app/assets/images/*.jpg",
-      "!app/assets/images/*.jpeg",
-      "!app/assets/images/*.gif",
-      "!app/assets/images/*.svg",
-      "!app/assets/images/*.icns"
+      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
     ],
     "win": {
       "target": "nsis",
-      "icon": "app/assets/images/SealCircle.ico"
+      "icon": "app/assets/images/SealCircle.ico",
+      "files": [
+        "**/*",
+        "!app/assets/images/**/*",
+        "app/assets/images/SealCircle.ico"
+      ]
     },
     "mac": {
       "target": "dmg",
       "category": "public.app-category.games",
-      "icon": null,
-      "files": [
-        "!app/assets/images/*.ico"
-      ]
+      "icon": null
     },
     "linux": {
       "target": "AppImage",
-      "category": "Game",
-      "files": [
-        "!app/assets/images/*.ico"
-      ]
+      "category": "Game"
     },
     "nsis": {
       "oneClick": false,
