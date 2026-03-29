@@ -6,9 +6,9 @@ title = "Eminium Games Launcher"
 [ejs.landing]
 mediaGitHubURL = "https://github.com/Eminium-Games/EminiumLauncher-v2"
 mediaXURL = "#"
-mediaInstagramURL = "#"
-mediaYouTubeURL = "#"
-mediaDiscordURL = "https://discord.gg/zNWUXdt"
+mediaInstagramURL = "https://instagram.com/eminium.off"
+mediaYouTubeURL = "https://www.youtube.com/@EminiumGames"
+mediaDiscordURL = "https://discord.gg/RsDEKUXT5f"
 
 [ejs.settings]
 sourceGithubLink = "https://github.com/Eminium-Games/EminiumLauncher-v2"
