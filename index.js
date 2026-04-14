@@ -81,7 +81,7 @@ async function checkForUpdates() {
 // Download and install update automatically
 async function downloadAndInstallUpdate(latestVersion) {
     try {
-        const downloadUrl = `https://github.com/Eminium-Games/EminiumLauncher-v2/releases/download/v${latestVersion}/Eminium%20Games%20Launcher%20Setup%20${latestVersion}.exe`
+        const downloadUrl = `https://github.com/Eminium-Games/EminiumLauncher-v2/releases/download/v${latestVersion}/Eminium.Games.Launcher.Setup.${latestVersion}.exe`
         const tempDir = os.tmpdir()
         const installerPath = path.join(tempDir, `EminiumLauncher-${latestVersion}.exe`)
         
